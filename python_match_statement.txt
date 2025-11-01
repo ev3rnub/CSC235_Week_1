@@ -1,0 +1,183 @@
+VPHS 0001110125
+SRC: Local LLM via Ollama,
+MacOS(m3 Max, 40c-gpu, 128g)
+Model: GPT-OSS 120b
+    architecture        gptoss
+    parameters          116.8B
+    context length      131072
+    embedding length    2880
+    quantization        MXFP4
+
+
+**Python 3 (≥3.10) “match” Cheat Sheet**
+
+---
+
+### What It Is
+`match` is Python’s *structural pattern‑matching* statement. It lets you compare a subject value against a series of
+*patterns* and execute the first block whose pattern fits, much like a switch‑case statement but far more powerful because
+the patterns can de‑structure objects, sequences, mappings, and even custom classes.
+
+---
+
+### Basic Syntax
+
+```python
+match subject:
+    case pattern1:
+        # block executed if subject fits pattern1
+    case pattern2 if guard_expression:
+        # block executed if pattern2 matches **and** guard_expression is true
+    case pattern3 | pattern4:
+        # the vertical bar combines alternatives; any matching alternative works
+    case _:
+        # wildcard (matches anything) – often used as a default case
+```
+
+*The colon after `match` and each `case` is required; the bodies must be indented.*
+
+---
+
+### The Subject
+
+- Any expression can serve as the *subject*: a variable, a function call, a literal, etc.
+- The subject is evaluated **once**, before any case is tried.
+
+---
+
+### Patterns You Can Use
+
+1. **Literal Patterns** – match exact values.
+   ```python
+   case 0:                # matches the integer 0
+   case "hello":          # matches the string "hello"
+   case True:             # matches the boolean True
+   ```
+
+2. **Variable Capture** – binds the subject (or a sub‑part) to a new name.
+   ```python
+   case x:                # always matches; x becomes the subject
+   case (a, b):           # matches a 2‑tuple and binds its elements to a, b
+   ```
+
+3. **Wildcard (`_`)** – matches anything but does **not** bind a name.
+   ```python
+   case _:                # like a default case
+   ```
+
+4. **Sequence Patterns** – de‑structure lists, tuples, or any iterable that supports `__len__` and element indexing.
+   - Fixed length: `case [x, y, z]:` matches a list of exactly three items.
+   - Variable length with star‑capture: `case [head, *tail]:` captures the first element in `head` and the remainder in `tail`.
+   - Mixed: `case (x, *rest, y):` matches a tuple with at least two items, binding the first to `x`, the last to `y`, and everything in between to `rest`.
+
+5. **Mapping Patterns** – work with dictionaries (or any Mapping).
+   ```python
+   case {"type": "error", "code": c}:
+       # c receives the value associated with "code"
+   case {"name": name, **rest}:
+       # name is bound, and the rest of the keys/values go into `rest`
+   ```
+
+6. **Class (Object) Patterns** – match an instance of a specific class and optionally extract its attributes via `__match_args__` or by naming fields.
+   ```python
+   case Point(x, y):               # works if Point defines __match_args__ = ("x","y")
+   case datetime(year, month, day):
+   case MyClass(attr1=a, attr2=b): # keyword style works for any dataclass‑like object
+   ```
+
+7. **OR Patterns (`|`)** – combine alternatives.
+   ```python
+   case 0 | 1 | 2:                 # matches any of the three literals
+   case ("ok", _) | ("success", _):
+   ```
+
+8. **As‑Pattern (`pattern as name`)** – keep the whole matched value while also de‑structuring it.
+   ```python
+   case [first, *rest] as full_list:
+       # `first` and `rest` are bound, and `full_list` holds the original list
+   ```
+
+9. **Guard (`if` clause)** – an additional Boolean expression that must be true for the case to succeed.
+   ```python
+   case (x, y) if x < y:
+       # only matches when the tuple is ordered ascending
+   ```
+
+---
+
+### Ordering Matters
+
+- Cases are tried **top‑to‑bottom**; the first matching case wins.
+- Place more specific patterns before more general ones (e.g., literals before a catch‑all variable pattern).
+- The wildcard case (`case _:`) should be last; it acts as the default.
+
+---
+
+### Common Gotchas
+
+| Issue | What Happens | How to Avoid |
+|------|---------------|--------------|
+| **Variable name collision** | A name used in a pattern shadows an existing variable in the surrounding scope. | Use distinct names or the `_` placeholder for values you don’t need. |
+| **Mutable default patterns** | Patterns that include mutable literals (e.g., `case []:`) match only if the subject is *exactly* that object, not any empty list. | Remember that pattern matching checks structural equality, not identity; `case []:` matches any empty sequence. |
+| **Missing `__match_args__`** | Class patterns without `__match_args__` fall back to keyword matching only. | Define `__match_args__` in custom classes or use keyword style (`Class(attr=val)`). |
+| **Star‑capture on non‑sequences** | Using `*rest` with a non‑iterable subject raises `TypeError`. | Ensure the subject’s type supports sequence unpacking before using star‑capture. |
+
+(These points are written in sentence form; no tables are used in the final cheat sheet.)
+
+---
+
+### Quick Example – A Mini‑AST Interpreter
+
+```python
+def eval_expr(node):
+    match node:
+        case {"type": "num", "value": v}:
+            return v
+
+        case {"type": "binop", "op": "+", "left": l, "right": r}:
+            return eval_expr(l) + eval_expr(r)
+
+        case {"type": "binop", "op": "*", "left": l, "right": r}:
+            return eval_expr(l) * eval_expr(r)
+
+        case {"type": "unary", "op": "-", "operand": x}:
+            return -eval_expr(x)
+
+        case _:
+            raise ValueError(f"Unsupported node: {node}")
+```
+
+- The subject is a dictionary representing an expression node.
+- Literal matching (`"type": "num"`), keyword extraction (`"value": v`), and a default fallback (`case _:`) illustrate the most common pattern forms.
+
+---
+
+### One‑Liner Form (when the body is a single statement)
+
+Python allows a compact syntax using a colon‑terminated case and an inline statement:
+
+```python
+match cmd:
+    case "quit":   break
+    case "help":   print(help_text)
+    case _:        print("unknown command")
+```
+
+The indentation rules still apply; the statement must be on the same line as the `case` header.
+
+---
+
+### Recap – When to Use `match`
+
+- **De‑structuring** complex data (tuples, lists, dicts, objects) in a readable way.
+- **Replacing** long chains of `if … elif … elif …` that test the same variable against many shapes.
+- **Pattern‑driven** logic such as interpreters, parsers, or protocol dispatchers.
+
+If you only need a simple equality check, a plain `if` is still clearer. Use `match` when the strength of structural patterns outweighs the added syntactic weight.
+
+---
+
+That’s the essential “match” reference you need to start writing clean, expressive pattern‑matching code in Python3.10
+and newer. Happy matching!
+
+VPHS 0000110125

@@ -1,0 +1,116 @@
+VPHS 0001110125
+SRC: Local LLM via Ollama,
+MacOS(m3 Max, 40c-gpu, 128g)
+Model: GPT-OSS 120b
+    architecture        gptoss
+    parameters          116.8B
+    context length      131072
+    embedding length    2880
+    quantization        MXFP4
+
+
+**Python 3 Variables – Quick Reference Cheat‑Sheet**
+
+---  
+
+**1. What Is a Variable?**  
+A variable is simply a name that references an object stored in memory. The name itself does not hold the value; it points to the underlying object.
+
+**2. Naming Rules**  
+- A name may contain letters, digits and the underscore character “_”.  
+- The first character must be a letter or underscore; it cannot start with a digit.  
+- Names are case‑sensitive: `value`, `Value` and `VALUE` are three distinct identifiers.  
+- Reserved words such as `def`, `class`, `if`, `while`, etc., cannot be used as variable names.  
+
+**3. Common Conventions**  
+- Use lowercase words separated by underscores for regular variables (`user_name`).  
+- Constants are written in all caps with underscores (`MAX_RETRIES`).  
+- Private/internal names often begin with a single underscore (`_cache`).  
+- “Magic” or dunder methods start and end with double underscores (`__init__`).  
+
+**4. Assignment Basics**  
+```python
+x = 10                # integer object
+name = "Alice"        # string object
+price = 19.99         # floating‑point object
+active = True         # boolean object
+```
+Assignment binds the name on the left to the object produced by the expression on the right.
+
+**5. Multiple Assignment**  
+- Assign the same value to several names: `a = b = c = 0`.  
+- Unpack an iterable into separate variables: `x, y, z = (1, 2, 3)`.  
+- Use the asterisk to collect the rest: `first, *rest = [10, 20, 30, 40]`.
+
+**6. Swapping Values**  
+Python lets you exchange two variables without a temporary placeholder:  
+```python
+a, b = b, a
+```
+
+**7. Augmented Assignment Operators**  
+These combine an operation with assignment and may modify mutable objects in place:  
+```python
+counter += 1      # equivalent to counter = counter + 1
+total   *= 2      # equivalent to total = total * 2
+my_set   |= {5}   # adds 5 to the set in place
+```
+
+**8. Variable Scope**  
+- **Local Scope:** A name defined inside a function is visible only within that function.  
+- **Enclosing (Nonlocal) Scope:** A nested function can access names from its containing function; use `nonlocal` to rebind them.  
+- **Global Scope:** Names defined at the top level of a module are global to that module. Inside a function, `global` declares that assignments refer to the module‑level name.  
+- **Built‑in Scope:** Names provided by Python’s built‑ins (`len`, `list`, etc.) are always accessible unless shadowed.
+
+**9. The `global` and `nonlocal` Statements**  
+```python
+counter = 0                 # global variable
+
+def outer():
+    total = 5               # enclosing variable
+
+    def inner():
+        nonlocal total      # refer to total in outer()
+        global counter     # refer to module‑level counter
+        total += 1
+        counter += 1
+```
+
+**10. Type Hints for Variables**  
+Python 3.6+ allows optional static type information:  
+```python
+age: int = 30
+names: list[str] = ["Bob", "Sue"]
+price: float                # declared without initial value
+```
+Type hints are ignored at runtime but help static analysers and IDEs.
+
+**11. Dynamic Typing**  
+A variable can be rebound to objects of different types without error:  
+```python
+data = 42          # int
+data = "hello"    # now a str
+data = [1, 2, 3]  # now a list
+```
+
+**12. Mutable vs. Immutable Objects**  
+- **Immutable:** `int`, `float`, `bool`, `str`, `tuple`, `frozenset`. Their value cannot change after creation; rebinding creates a new object.  
+- **Mutable:** `list`, `dict`, `set`, `bytearray`. Their contents can be altered in place, which may affect all names that reference the same object.  
+
+**13. Deleting a Variable**  
+`del name` removes the binding from the current namespace. If no other references exist, the object becomes eligible for garbage collection.  
+
+**14. Common Pitfalls**  
+- Accidentally modifying a mutable object that is shared by multiple variables.  
+- Using a variable before it has been bound, which raises `UnboundLocalError`.  
+- Forgetting to declare `global` or `nonlocal` when you intend to modify a name from an outer scope; otherwise Python creates a new local variable.  
+
+**15. Best Practices**  
+- Choose clear, descriptive names; avoid single letters except for loop counters or throw‑away values.  
+- Keep the lifetime of mutable objects as short as possible to reduce unintended side effects.  
+- Use type hints for public APIs and complex data structures.  
+- Follow PEP 8 naming conventions to keep code readable and consistent.  
+
+---  
+
+VPHS 0000110125

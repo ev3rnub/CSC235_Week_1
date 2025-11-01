@@ -1,0 +1,119 @@
+VPHS 0001110125
+SRC: Local LLM via Ollama,
+MacOS(m3 Max, 40c-gpu, 128g)
+Model: GPT-OSS 120b
+    architecture        gptoss
+    parameters          116.8B
+    context length      131072
+    embedding length    2880
+    quantization        MXFP4
+
+
+**Python 3 “if” Cheat Sheet**
+
+- **Purpose**
+  The `if` statement directs program flow by executing a block of code only when a given condition evaluates to a truthy value. It can be followed by optional `elif` (else‑if) clauses and a final `else` clause that runs when none of the previous conditions are true.
+
+- **Basic Syntax**
+  ```python
+  if condition:
+      # indented block runs when condition is true
+  elif another_condition:
+      # runs only if the first condition was false and this one is true
+  else:
+      # runs when every preceding condition was false
+  ```
+  *Indentation* (typically 4 spaces) is mandatory; Python uses it to delimit the blocks.
+
+- **Condition Rules**
+  - Anything that can be interpreted as a Boolean (`True`/`False`) is allowed: comparisons (`a == b`), function calls that return a bool, or any object whose truth value is defined by its `__bool__`/`__len__` method.
+  - Empty containers (`[]`, `{}`, `()`, `''`), numeric zero, `None`, and `False` are *falsy*. Everything else is *truthy*.
+
+- **Logical Operators**
+  - `and`: true if **both** operands are truthy; short‑circuits on the first falsy operand.
+  - `or`: true if **any** operand is truthy; short‑circuits on the first truthy operand.
+  - `not`: negates the truth value of its operand.
+  Parentheses can be used to group expressions and make precedence explicit.
+
+- **Chaining Comparisons**
+  Python allows natural mathematical chaining:
+  ```python
+  if 0 < x <= 10:
+      ...
+  ```
+  This is equivalent to `0 < x and x <= 10` but evaluates `x` only once.
+
+- **Multiple Conditions on One Line**
+  Use a single `if` with a compound Boolean expression, but keep readability in mind:
+  ```python
+  if (a > 0 and b < 0) or (c == 42):
+      ...
+  ```
+
+- **One‑Liner (Ternary Conditional Expression)**
+  For simple assignments or returns you can embed the conditional in an expression:
+  ```python
+  result = "yes" if flag else "no"
+  ```
+  This is *not* a statement; it cannot replace a full `if` block that contains multiple statements.
+
+- **Inline `if` without `else`**
+  Occasionally you just want to execute something when a condition holds and do nothing otherwise:
+  ```python
+  if debug: print("debug mode on")
+  ```
+  Remember that the colon and indentation (or a single statement on the same line) are still required.
+
+- **Nested `if` Statements**
+  Indentation naturally nests blocks:
+  ```python
+  if user_is_admin:
+      if request.method == "POST":
+          handle_admin_post()
+      else:
+          show_admin_dashboard()
+  ```
+
+- **`elif` vs. Multiple `if`s**
+  - Use `elif` when the conditions are *mutually exclusive*; only the first true branch runs.
+  - Separate `if` statements are evaluated independently, so more than one block may execute.
+
+- **Common Pitfalls**
+  - **Assignment vs. Comparison**: Python uses `=` for assignment and `==` for equality comparison; writing `if x = 5:` raises a syntax error.
+  - **Using `is` for Equality**: `is` checks object identity, not value equality. Use `is` only for singletons (`None`, `True`, `False`) or when you intentionally need identity comparison.
+  - **Mutable Default Conditions**: If a condition depends on a mutable default argument, remember that the default is evaluated once at function definition time.
+  - **Forgotten Indentation**: Missing or mismatched indentation leads to `IndentationError` or logical bugs.
+
+- **Truthiness Customization**
+  You can define how your own objects behave in Boolean contexts by implementing `__bool__(self)` (returning `True` or `False`) or, for older code, `__len__(self)` (non‑zero length is truthy).
+
+- **Quick Example**
+  ```python
+  def categorize(value):
+      if value is None:
+          return "missing"
+      elif isinstance(value, (int, float)):
+          if value < 0:
+              return "negative"
+          elif value == 0:
+              return "zero"
+          else:
+              return "positive"
+      elif isinstance(value, str) and value.strip():
+          return "non‑empty string"
+      else:
+          return "other"
+  ```
+
+  This example shows:
+  * `if … elif … else` hierarchy,
+  * nesting of another `if` block,
+  * use of `is` for the `None` singleton,
+  * `isinstance` for type checking, and
+  * a fallback `else` for everything not caught earlier.
+
+That’s everything you need to write, read, and debug `if` statements in Python 3.
+Keep the indentation clean, think in terms of truthy/falsy values, and use `elif`
+when you want mutually exclusive branches. Happy branching!
+
+VPHS 0000110125

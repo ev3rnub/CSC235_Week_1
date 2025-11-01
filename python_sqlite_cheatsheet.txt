@@ -1,0 +1,223 @@
+VPHS 0001110125
+SRC: Local LLM via Ollama,
+MacOS(m3 Max, 40c-gpu, 128g)
+Model: GPT-OSS 120b
+    architecture        gptoss
+    parameters          116.8B
+    context length      131072
+    embedding length    2880
+    quantization        MXFP4
+
+
+**SQLite in Python 3 – Quick‑Reference Cheat‑Sheet**
+
+---
+
+### 1. Getting Started
+- Import the built‑in module: `import sqlite3`.
+- Open (or create) a database file with `sqlite3.connect('example.db')`.
+- For an in‑memory database use `sqlite3.connect(':memory:')`.
+- The `connect` call returns a **Connection** object that represents the database session.
+
+### 2. Working with a Cursor
+- Obtain a cursor via `cur = conn.cursor()`.
+- The cursor is the object that actually executes SQL statements and fetches results.
+- After you are done, close the cursor with `cur.close()`.
+
+### 3. Creating Tables
+```python
+cur.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE,
+        age  INTEGER
+    )
+''')
+```
+- `IF NOT EXISTS` prevents an error if the table already exists.
+- `INTEGER PRIMARY KEY` makes the column an auto‑incrementing rowid.
+
+### 4. Inserting Data
+
+**Single row – positional placeholders**
+```python
+cur.execute('INSERT INTO users (name, email, age) VALUES (?, ?, ?)',
+            ('Alice', 'alice@example.com', 30))
+```
+
+**Single row – named placeholders**
+```python
+cur.execute('INSERT INTO users (name, email, age) VALUES (:n, :e, :a)',
+            {'n': 'Bob', 'e': 'bob@example.com', 'a': 25})
+```
+
+**Multiple rows – `executemany`**
+```python
+rows = [
+    ('Carol', 'carol@example.com', 22),
+    ('Dave',  'dave@example.com',  28)
+]
+cur.executemany('INSERT INTO users (name, email, age) VALUES (?, ?, ?)', rows)
+```
+
+- **Never** concatenate values directly into the SQL string; always use placeholders to avoid SQL injection.
+
+### 5. Committing and Rolling Back
+
+- By default the connection is in **transaction mode**.
+- Call `conn.commit()` after a series of writes to make the changes permanent.
+- If an error occurs, call `conn.rollback()` to undo the pending transaction.
+
+### 6. Querying Data
+
+**Fetching all rows**
+```python
+cur.execute('SELECT id, name, email FROM users WHERE age > ?', (20,))
+rows = cur.fetchall()          # list of tuples
+```
+
+**Iterating row‑by‑row** (memory‑efficient)
+```python
+cur.execute('SELECT * FROM users')
+for row in cur:
+    print(row)                 # each row is a tuple
+```
+
+**Fetching a single row**
+```python
+cur.execute('SELECT name FROM users WHERE id = ?', (1,))
+name = cur.fetchone()[0]       # returns None if no row matches
+```
+
+### 7. Row Factories – Access Columns by Name
+
+```python
+conn.row_factory = sqlite3.Row      # must be set before creating any cursor
+cur = conn.cursor()
+cur.execute('SELECT * FROM users')
+row = cur.fetchone()
+print(row['email'])                 # column accessed like a dict
+```
+
+- Other useful factories: `sqlite3.Row` (dict‑like), `sqlite3.Row` with `namedtuple` conversion, or a custom callable that builds objects.
+
+### 8. Parameter Types and Conversions
+
+- Python `int`, `float`, `str`, `bytes`, and `None` map directly to SQLite’s INTEGER, REAL, TEXT, BLOB, and NULL.
+- `datetime` objects are not converted automatically; store them as ISO‑8601 strings or Unix timestamps, and convert back in your code.
+
+### 9. Using Context Managers
+
+```python
+import sqlite3
+
+with sqlite3.connect('example.db') as conn:
+    cur = conn.cursor()
+    cur.execute('SELECT COUNT(*) FROM users')
+    count = cur.fetchone()[0]
+# Exiting the block automatically commits (or rolls back on exception) and closes the connection.
+```
+
+- The `with` statement simplifies transaction handling and guarantees that the connection is closed.
+
+### 10. Attaching Additional Databases
+
+```python
+cur.execute("ATTACH DATABASE 'archive.db' AS archive")
+cur.execute('SELECT * FROM archive.users')
+```
+
+- Use `DETACH DATABASE archive` to remove the attachment.
+
+### 11. Pragmas – Controlling SQLite Behaviour
+
+- **Foreign key enforcement** (off by default):
+  ```python
+  cur.execute('PRAGMA foreign_keys = ON')
+  ```
+
+- **Journal mode** (control durability):
+  ```python
+  cur.execute('PRAGMA journal_mode = WAL')   # write‑ahead logging
+  ```
+
+- **Synchronous level** (trade‑off between speed and safety):
+  ```python
+  cur.execute('PRAGMA synchronous = NORMAL')
+  ```
+
+- Retrieve pragma values with a `SELECT` statement, e.g., `SELECT pragma_user_version FROM pragma_user_version`.
+
+### 12. Indexes
+
+- Speed up lookups by creating an index on frequently queried columns:
+  ```python
+  cur.execute('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)')
+  ```
+
+- Indexes are automatically updated when rows are inserted, updated, or deleted.
+
+### 13. Handling Errors
+
+- All SQLite exceptions inherit from `sqlite3.Error`.
+- Common subclasses: `IntegrityError` (constraint violation), `OperationalError` (bad SQL or locked database), `ProgrammingError` (API misuse).
+
+```python
+try:
+    cur.execute('INSERT INTO users (email) VALUES (?)', ('duplicate@example.com',))
+    conn.commit()
+except sqlite3.IntegrityError as e:
+    print('Constraint failed:', e)
+    conn.rollback()
+```
+
+### 14. Storing Binary Data (BLOBs)
+
+```python
+with open('photo.jpg', 'rb') as f:
+    blob = f.read()
+cur.execute('INSERT INTO photos (data) VALUES (?)', (blob,))
+```
+
+- Retrieve with `row[0]` and write back to a file if needed.
+
+### 15. Using pathlib for Database Paths
+
+```python
+from pathlib import Path
+db_path = Path('data') / 'mydb.sqlite3'
+conn = sqlite3.connect(str(db_path))
+```
+
+- Converting the `Path` object to a string keeps `sqlite3.connect` happy on all platforms.
+
+### 16. Interoperability with Pandas (optional)
+
+```python
+import pandas as pd
+df = pd.read_sql_query('SELECT * FROM users', conn)
+# Write a DataFrame back to SQLite
+df.to_sql('users_copy', conn, if_exists='replace', index=False)
+```
+
+- Pandas uses the connection’s cursor under the hood, so all pragmas and row factories remain effective.
+
+### 17. Closing the Connection
+
+- When you are finished, call `conn.close()`.
+- If you used a context manager (`with` block), the close happens automatically.
+
+---
+
+**Key Take‑aways**
+
+- Always use parameter placeholders (`?` or named `:name`) to keep your code safe.
+- Set `conn.row_factory = sqlite3.Row` early if you prefer column names over positional indexes.
+- Enable foreign‑key enforcement with `PRAGMA foreign_keys = ON` as soon as you open the connection.
+- Use the `with` statement to make transaction handling and cleanup painless.
+
+This cheat‑sheet covers the most common SQLite operations you’ll need when writing Python 3 applications. Happy coding!
+---
+
+VPHS 0000110125

@@ -1,0 +1,130 @@
+VPHS 0001110125
+SRC: Local LLM via Ollama,
+MacOS(m3 Max, 40c-gpu, 128g)
+Model: GPT-OSS 120b
+    architecture        gptoss
+    parameters          116.8B
+    context length      131072
+    embedding length    2880
+    quantization        MXFP4
+
+
+**User‑Input Cheat‑Sheet for Python 3**
+
+---
+
+### The Built‑in `input()` Function
+- Call `input(prompt)` to display a prompt and wait for the user to type a line terminated by **Enter**.
+- The function always returns a **string**; convert it with `int()`, `float()`, `bool()` or any custom parser you need.
+- Example: `age = int(input("Enter your age: "))`.
+
+### Stripping Newlines and Whitespace
+- `input()` removes the trailing newline automatically, but leading or trailing spaces remain; use `.strip()` when you
+want to discard them.
+- Example: `name = input("Name: ").strip()`.
+
+### Handling Empty Input
+- Test for an empty string (`""`) to decide whether to use a default value or reprompt the user.
+- Example:
+  ```python
+  answer = input("Continue? [y/N]: ").strip().lower()
+  if not answer:
+      answer = "n"
+  ```
+
+### Re‑prompting Until Valid Data Is Received
+- Wrap the prompt in a `while True` loop, break only when the conversion succeeds, and catch `ValueError` for numeric input.
+- Example:
+  ```python
+  while True:
+      try:
+          qty = int(input("Quantity: "))
+          break
+      except ValueError:
+          print("Please enter a whole number.")
+  ```
+
+### Reading Multiple Values on One Line
+- Split the raw string with `.split()` (splits on any whitespace) and map each piece to the desired type.
+- Example:
+  ```python
+  x, y = map(float, input("Enter two coordinates: ").split())
+  ```
+
+### Using `sys.stdin` for Streamed Input
+- Import `sys` and iterate over `sys.stdin` to read an arbitrary number of lines, useful for piping data from the command line.
+- Example:
+  ```python
+  import sys
+  for line in sys.stdin:
+      process(line.rstrip("\n"))
+  ```
+
+### Detecting End‑of‑File (EOF)
+- When reading interactively, catching `EOFError` lets you exit gracefully if the user presses **Ctrl‑D** (Unix) or
+**Ctrl‑Z** (Windows).
+- Example:
+  ```python
+  try:
+      text = input("Enter a paragraph (Ctrl‑D to finish): ")
+  except EOFError:
+      text = ""
+  ```
+
+### Secure Password Entry with `getpass`
+- Import `getpass` and call `getpass.getpass(prompt)`; the typed characters are not echoed to the terminal.
+- Example: `pwd = getpass.getpass("Password: ")`.
+
+### Command‑Line Arguments with `argparse`
+- For non‑interactive scripts, define expected arguments with `argparse.ArgumentParser`, then call `parser.parse_args()`
+to obtain a namespace of values.
+- Example:
+  ```python
+  import argparse
+  parser = argparse.ArgumentParser(description="Process a file.")
+  parser.add_argument("path", help="Path to the input file")
+  parser.add_argument("-v", "--verbose", action="store_true")
+  args = parser.parse_args()
+  ```
+
+### Simple Argument Parsing with `sys.argv`
+- Access the raw list `sys.argv` where the first element is the script name; convert subsequent elements as needed.
+- Example: `filename = sys.argv[1] if len(sys.argv) > 1 else "default.txt"`.
+
+### Prompting for Confirmation
+- A common pattern is to accept a single character, defaulting to a safe choice when the user just presses **Enter**.
+- Example:
+  ```python
+  def confirm(message, default=False):
+      choices = "Y/n" if default else "y/N"
+      resp = input(f"{message} [{choices}]: ").strip().lower()
+      if not resp:
+          return default
+      return resp.startswith("y")
+  ```
+
+### Reading Binary Data from the Console
+- Use `sys.stdin.buffer.read()` to obtain raw bytes, for example when the user pipes a binary file into the script.
+- Example: `data = sys.stdin.buffer.read()` reads until EOF.
+
+### Limiting Input Length (Safety)
+- After reading, you can truncate or validate length: `if len(text) > 200: raise ValueError("Input too long")`.
+
+
+### Using Third‑Party Helpers (Optional)
+- Libraries such as **click** or **prompt_toolkit** provide richer prompts, auto‑completion, and colorized output, but
+the core behavior still relies on `input()` under the hood.
+
+---
+
+**Key Take‑aways**
+
+- `input()` is the simplest way to get a line of text; always convert to the needed type.
+- Wrap conversion in `try/except` and loop to enforce correct input.
+- Use `sys.stdin` for piped or multi‑line data, and catch `EOFError` for graceful termination.
+- For passwords, switch to `getpass.getpass`.
+- For non‑interactive use, prefer `argparse` over manual `sys.argv` handling.
+
+These patterns cover the majority of interactive and streamed input scenarios you’ll encounter in Python 3 programs. Happy coding!
+
+VPHS 0000110125

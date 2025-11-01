@@ -1,0 +1,234 @@
+VPHS 0001110125
+SRC: Local LLM via Ollama,
+MacOS(m3 Max, 40c-gpu, 128g)
+Model: GPT-OSS 120b
+    architecture        gptoss
+    parameters          116.8B
+    context length      131072
+    embedding length    2880
+    quantization        MXFP4
+
+
+**Classes & Functions – Python 3 Cheat‑Sheet**
+
+---
+
+### Defining a Function
+
+- Use the `def` keyword, give the function a descriptive name, list parameters in parentheses, and end the header with a colon.
+- The body is an indented block; the function returns `None` automatically unless you use a `return` statement.
+- Example:
+
+  ```python
+  def greet(name: str, excited: bool = False) -> str:
+      """Return a greeting string."""
+      msg = f"Hello, {name}"
+      return msg + "!" if excited else msg
+  ```
+
+- **Positional arguments** are filled by position, **keyword arguments** can be supplied by name, and **default values** make a parameter optional.
+
+### Variable‑Length Argument Lists
+
+- `*args` collects any extra positional arguments into a tuple.
+- `**kwargs` collects any extra keyword arguments into a dictionary.
+- They can appear together, but `*args` must come before `**kwargs`.
+
+  ```python
+  def show(*items, sep: str = ", ", **metadata):
+      print(sep.join(map(str, items)))
+      print("Metadata:", metadata)
+  ```
+
+### Return Types
+
+- A function may return any object, including multiple values packed as a tuple:
+
+  ```python
+  def split(full: str) -> tuple[str, str]:
+      first, _, last = full.partition(" ")
+      return first, last
+  ```
+
+- Use type hints (`-> int`, `-> list[str]`, etc.) to convey the intended return type; they are not enforced at runtime.
+
+### Lambda Expressions
+
+- A `lambda` creates an anonymous, single‑expression function:
+
+  ```python
+  squares = list(map(lambda x: x * x, range(5)))   # [0, 1, 4, 9, 16]
+  ```
+
+- Prefer `def` for anything more complex than a simple expression; readability suffers with long lambdas.
+
+### Decorators
+
+- A decorator is a callable that receives a function (or method) and returns a wrapped version.
+- The `@decorator` syntax places the decorator directly above the function definition.
+
+  ```python
+  import functools
+
+  def timed(func):
+      @functools.wraps(func)
+      def wrapper(*args, **kwargs):
+          start = time.perf_counter()
+          result = func(*args, **kwargs)
+          elapsed = time.perf_counter() - start
+          print(f"{func.__name__} took {elapsed:.3f}s")
+          return result
+      return wrapper
+
+  @timed
+  def compute():
+      …
+  ```
+
+- Common built‑ins: `@staticmethod`, `@classmethod`, `@property`.
+
+### Class Basics
+
+- Use the `class` keyword, optionally inherit from one or more base classes in parentheses.
+- The class body runs once at definition time; it usually contains method definitions and class‑level attributes.
+
+  ```python
+  class Person:
+      species = "Homo sapiens"          # class attribute, shared by all instances
+
+      def __init__(self, name: str, age: int):
+          self.name = name               # instance attribute
+          self.age = age
+
+      def birthday(self) -> None:
+          """Increment the person's age."""
+          self.age += 1
+
+      def __repr__(self) -> str:
+          return f"Person(name={self.name!r}, age={self.age})"
+  ```
+
+### Instance Methods, Class Methods, and Static Methods
+
+- **Instance methods** receive the instance as the first parameter (`self`). They can read or modify the object’s state.
+- **Class methods** receive the class itself as the first parameter (`cls`) and are marked with `@classmethod`. They are useful for alternative constructors.
+
+  ```python
+  class Circle:
+      def __init__(self, radius: float):
+          self.radius = radius
+
+      @classmethod
+      def from_diameter(cls, dia: float):
+          return cls(dia / 2)
+  ```
+
+- **Static methods** receive no implicit first argument and are marked with `@staticmethod`. They behave like plain functions that belong to the class’s namespace.
+
+  ```python
+  class Math:
+      @staticmethod
+      def is_even(n: int) -> bool:
+          return n % 2 == 0
+  ```
+
+### Inheritance and Method Resolution
+
+- Subclass a parent with `class Child(Parent):`. The child inherits all attributes and methods, and can override any of them.
+- Call the parent implementation with `super()`.
+
+  ```python
+  class Employee(Person):
+      def __init__(self, name, age, employee_id):
+          super().__init__(name, age)
+          self.employee_id = employee_id
+
+      def __repr__(self):
+          base = super().__repr__()
+          return f"{base[:-1]}, employee_id={self.employee_id})"
+  ```
+
+- Python follows the **C3 linearization** (method resolution order, MRO) to decide which parent method runs when multiple inheritance is involved.
+
+### Properties – Managed Attribute Access
+
+- Use `@property` to turn a method into a read‑only attribute, and `@<name>.setter` to define a write‑only counterpart.
+
+  ```python
+  class Rectangle:
+      def __init__(self, width, height):
+          self._width = width
+          self._height = height
+
+      @property
+      def area(self) -> float:
+          return self._width * self._height
+
+      @property
+      def width(self) -> float:
+          return self._width
+
+      @width.setter
+      def width(self, value: float):
+          if value <= 0:
+              raise ValueError("Width must be positive")
+          self._width = value
+  ```
+
+### Dunder (Special) Methods
+
+- `__init__` – object initialization.
+- `__repr__` – unambiguous string representation, used by `repr()`.
+- `__str__` – readable string representation, used by `print()`.
+- `__len__`, `__getitem__`, `__setitem__`, `__iter__` – make objects behave like containers.
+- `__call__` – allow an instance to be called as a function.
+
+### When to Use a Function vs. a Method
+
+- Use a **function** when the operation does not need to know anything about a particular object’s state.
+- Use a **method** when the operation works on or modifies the data stored in an instance (or class).
+- Keeping pure functions separate from classes improves testability and reusability.
+
+### The “`if __name__ == '__main__':`” Guard
+
+#### What It Does
+
+- When a Python file is executed directly (`python script.py`), the interpreter sets the module’s global variable `__name__` to the string `'__main__'`.
+- When the same file is imported as a module, `__name__` receives the module’s actual name (e.g., `'my_package.utils'`).
+
+#### Why It Is Generally Useful
+
+1. **Separation of concerns** – Code that runs only when the file is executed (such as demo usage, CLI parsing, or simple tests) stays out of the import path, preventing side‑effects when other modules import it.
+2. **Avoids accidental execution** – Importing a module should never start a long‑running process, open network connections, or modify global state unintentionally.
+3. **Enables reusable libraries** – The same file can serve both as a library (imported elsewhere) and as a script (run directly).
+4. **Facilitates quick manual testing** – You can place a short “smoke test” under the guard to verify behavior without needing a separate test suite.
+
+#### When It Might Be Skipped
+
+- In very small scripts that are never intended to be imported, the guard adds a line of boilerplate that some developers find unnecessary.
+- In notebooks or interactive sessions, `__name__` is already `'__main__'`, so the guard has no effect.
+
+#### Recommendation
+
+- **Use it by default** for any file that defines reusable functions, classes, or data.
+- If the file is truly a one‑off script, you may omit it, but keep in mind that future reuse (or accidental import) could cause unexpected side‑effects.
+
+### Quick Checklist for a Well‑Structured Module
+
+1. **Top‑level imports** only – no code that runs on import.
+2. **Public API** listed in `__all__` (optional but clarifies intent).
+3. **Helper functions / classes** defined first.
+4. **CLI entry point** (argparse, click, etc.) placed inside `if __name__ == '__main__':`.
+5. **Minimal side effects** – the module should be safe to import multiple times.
+
+---
+
+**Bottom Line**
+
+- Functions give you reusable, testable blocks of logic; methods bind that logic to objects, providing encapsulation and stateful behavior.
+- Classes group related data and behavior, support inheritance, and enable rich data models via special methods and properties.
+- The `if __name__ == '__main__':` guard is a simple, idiomatic way to keep import‑time side effects out of reusable code while still allowing the file to act as a script.
+
+Apply these patterns consistently and your Python code will be easier to read, test, and maintain. Happy coding!
+
+VPHS 0000110125

@@ -1,0 +1,193 @@
+VPHS 0001110125
+SRC: Local LLM via Ollama,
+MacOS(m3 Max, 40c-gpu, 128g)
+Model: GPT-OSS 120b
+    architecture        gptoss
+    parameters          116.8B
+    context length      131072
+    embedding length    2880
+    quantization        MXFP4
+
+**Regex Cheat‑Sheet for Parsing User Input in Python 3**
+
+
+### Online Interactive Regex Testers and visualizers
+- Use the below to test your regex patterns in near real time against test patterns. A valid method of devloping regex patterns for use in Python 3.
+- https://regex101.com/: Good for learning testing and debugging.
+- https://www.debuggex.com: Good for visualizing complex branching patterns.
+
+---
+
+### The `re` Module Basics
+- Import the regular‑expression engine with `import re`.
+- Always write patterns as raw strings (`r'…'`) so that backslashes are treated literally.
+- The most common functions are `re.match`, `re.search`, `re.fullmatch`, `re.findall`, `re.finditer`, `re.sub`, and `re.split`.
+
+### Compiling a Pattern
+- Compile once when you will reuse a pattern: `PAT = re.compile(r'your‑pattern', flags)`.
+- A compiled object provides the same methods (`PAT.match`, `PAT.search`, …) and is faster for repeated use.
+
+### Matching vs. Searching vs. Full‑Matching
+- `re.match(pattern, string, …)` checks only at the start of the string.
+- `re.search(pattern, string, …)` scans the whole string and returns the first occurrence.
+- `re.fullmatch(pattern, string, …)` succeeds only when the entire string conforms to the pattern, which is ideal for validation.
+
+### Flags (Options)
+- `re.IGNORECASE` (`re.I`) makes the match case‑insensitive.
+- `re.MULTILINE` (`re.M`) lets `^` and `$` match the start and end of each line instead of the whole string.
+- `re.DOTALL` (`re.S`) allows the dot (`.`) to match newline characters.
+- `re.VERBOSE` (`re.X`) permits whitespace and comments inside the pattern, making complex expressions readable.
+- Flags can be combined with the bitwise OR operator, for example `re.I | re.M`.
+
+### Basic Metacharacters
+- `.` matches any single character except a newline (unless `re.DOTALL` is used).
+- `^` matches the start of the string (or line with `re.MULTILINE`).
+- `$` matches the end of the string (or line with `re.MULTILINE`).
+- `*` matches zero or more repetitions, `+` matches one or more, and `?` matches zero or one.
+- `{m,n}` matches at least *m* and at most *n* repetitions; `{m}` is exactly *m*.
+
+### Character Classes
+- `[abc]` matches any one of the listed characters.
+- `[a‑z]` matches any lowercase ASCII letter; ranges can be combined (`[A‑Za‑z0‑9]`).
+- `[^abc]` matches any character *except* the listed ones.
+- `\d` matches a digit (`[0‑9]`), `\D` matches a non‑digit.
+- `\w` matches a word character (`[A‑Za‑z0‑9_]`), `\W` matches a non‑word character.
+- `\s` matches whitespace (space, tab, newline), `\S` matches non‑whitespace.
+
+### Grouping and Capturing
+- Parentheses `()` create a **capturing group**; the matched substring is stored in `match.group(n)` where *n* is the group number.
+- `(?:…)` creates a **non‑capturing group**, useful for applying quantifiers without storing the result.
+- Named groups use the syntax `(?P<name>…)`; later you can retrieve the value with `match.group('name')`.
+
+### Look‑Around Assertions (Zero‑Width)
+- Positive look‑ahead: `(?=…)` asserts that the following characters match the sub‑pattern but does not consume them.
+- Negative look‑ahead: `(?!…)` asserts that the following characters do **not** match.
+- Positive look‑behind: `(?<=…)` asserts that the preceding characters match.
+- Negative look‑behind: `(?<!…)` asserts that the preceding characters do **not** match.
+
+### Common Validation Patterns
+
+**Email address** (simple but practical):
+```python
+email_pat = re.compile(
+    r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+)
+```
+
+**US phone number** (optional country code, separators, parentheses):
+```python
+phone_pat = re.compile(
+    r'^\+?1?\s*(?:\(\d{3}\)|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}$'
+)
+```
+
+**IPv4 address**:
+```python
+ipv4_pat = re.compile(
+    r'^(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)'
+    r'(?:\.(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$'
+)
+```
+
+**Date in ISO format (YYYY‑MM‑DD)**:
+```python
+date_pat = re.compile(
+    r'^(?P<year>\d{4})-(?P<month>0[1-9]|1[0-2])-(?P<day>0[1-9]|[12]\d|3[01])$'
+)
+```
+
+**Time in 24‑hour format (HH:MM[:SS])**:
+```python
+time_pat = re.compile(
+    r'^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$'
+)
+```
+
+**URL (http/https, optional www, domain, optional path/query)**:
+```python
+url_pat = re.compile(
+    r'^(https?://)?'                # optional scheme
+    r'(?:www\.)?'                   # optional www
+    r'[\w-]+(?:\.[\w-]+)+'          # domain and TLD
+    r'(?:/[^\s]*)?$'                # optional path
+)
+```
+
+### 10. Extracting Data
+
+- Use `match = PAT.search(user_input)` and then `match.group(1)` or `match.group('name')` to pull out the needed part.
+- `re.finditer` returns an iterator of match objects, allowing you to loop over all occurrences while keeping access to groups.
+
+```python
+for m in re.finditer(r'(?P<key>\w+)=?(?P<val>\w+)', query_string):
+    print(m.group('key'), m.group('val'))
+```
+
+### 11. Substitutions and Sanitization
+
+- `re.sub(pattern, repl, string, count=0, flags=0)` replaces every non‑overlapping match with *repl*.
+- Use a function as the replacement argument when the new value depends on the matched text:
+
+```python
+def mask_email(m):
+    return m.group(0).replace('@', '[at]')
+
+safe = re.sub(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', mask_email, text)
+```
+
+- For stripping unwanted characters, combine a negated character class with `re.sub`:
+
+```python
+clean = re.sub(r'[^A-Za-z0-9\s]', '', raw_input)
+```
+
+### 12. Splitting Input
+
+- `re.split(pattern, string, maxsplit=0, flags=0)` splits the string at each match of *pattern*.
+- Useful for tokenising free‑form input where delimiters may be multiple characters or whitespace variations:
+
+```python
+tokens = re.split(r'\s*,\s*|\s+or\s+', user_list)
+```
+
+### 13. Verbose Mode for Complex Patterns
+
+- Write a multi‑line pattern with comments, and enable `re.VERBOSE` to ignore whitespace outside character classes:
+
+```python
+date_pat = re.compile(r'''
+    ^                       # start of string
+    (?P<year>\d{4})         # four‑digit year
+    -                       # literal dash
+    (?P<month>0[1-9]|1[0-2])# month 01‑12
+    -                       # literal dash
+    (?P<day>0[1-9]|[12]\d|3[01]) # day 01‑31
+    $                       # end of string
+''', re.VERBOSE)
+```
+
+### 14. Handling Unicode
+
+- Python 3’s `re` works with Unicode by default; `\w`, `\d`, and `\s` respect the Unicode character properties.
+- If you need ASCII‑only behavior, pass the flag `re.ASCII` (or `re.A`).
+
+### 15. Defensive Parsing Tips
+
+- Prefer `re.fullmatch` for strict validation; it prevents accidental acceptance of extra characters before or after the intended input.
+- Always test patterns with both valid and invalid examples to ensure they reject malformed data.
+- Do not rely on regex alone for security‑critical checks such as password strength; combine it with explicit logic.
+- When extracting data for later use (e.g., database insertion), sanitise the captured groups or use parameterised queries to avoid injection attacks.
+
+---
+
+**Quick Recall:**
+- Raw strings (`r'…'`) keep backslashes safe.
+- Compile once, reuse many times.
+- `fullmatch`= validation, `search`= anywhere, `match`= start only.
+- Parentheses capture; `(?:…)` groups without capturing; `(?P<name>…)` names a group.
+- Look‑arounds (`(?=…)`, `(?!…)`, `(?<=…)`, `(?<!…)`) let you assert context without consuming characters.
+- `re.VERBOSE` makes long patterns readable; combine with comments for maintainability.
+
+With these patterns and practices you can reliably parse, validate, and transform user‑provided strings in any Python 3 application. Happy regex‑crafting!
+
+VPHS 0001110125
