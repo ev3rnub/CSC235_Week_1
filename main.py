@@ -55,7 +55,7 @@ def read_help_text(aType):
         case "variables":
             output("python_variables_cheatsheet.txt")
         case _:
-            print(gray_output("For help, type 'help', else quit, or type q followed by enter to exit."))
+           print(blue_output("For help, type 'help', else quit, or type q followed by enter to exit."))
 
 
 def output(someFile):
@@ -64,8 +64,7 @@ def output(someFile):
         lines = file.readlines()
     for line in lines:
         #regex func goes here
-        mod_output = parse_titles(line)
-        print(green_output(mod_output))
+        print(green_output(parse_titles(line)))
         cnt += 1
         if cnt == 17:
             getInput = input(gray_output("Press enter to continue or type 'q' to quit:"))
@@ -73,7 +72,6 @@ def output(someFile):
                 break
             else:
                 cnt = 0
-            print(line)
 
 # NOT working
 def parse_titles(someLine):
@@ -102,6 +100,11 @@ def gray_output(someData) -> str:
 def bold_output(someData) -> str:
     BOLD = "\x1b[1m"
     processedData = BOLD + someData + BOLD
+    return processedData
+
+def blue_output(someData) -> str:
+    BLUE = "\x1b[34m"
+    processedData = BLUE + someData + BLUE
     return processedData
 
 def reset_output(someData) -> str:

@@ -7,3 +7,5 @@ Date: Nov 01, 2025
 
 ## 11/01/2025
 * 1. Created simple loop to monitor input from user, process said input and display "help" text regarding python.
+* 2. Added generic color scheme to output.
+* 3. Updated Readme.md.
