@@ -3,7 +3,7 @@
 # 10292025
 
 import os
-
+import re
 # future
 def init():
     pass
@@ -21,7 +21,7 @@ def main():
 def help(name):
     match name:
         case "goodbye":
-            print("VPHS is shutting down. Goodbye!")
+            print(white_output("VPHS is shutting down. Goodbye!"))
         case "information":
             print("Sample CLI APP for CSC325: Prof Hinton: Assignment .5.1: Your First Python Application: Verbose Python Help System: Chad Verbus")
         case "help":
@@ -39,39 +39,76 @@ def help(name):
 def read_help_text(aType):
     match aType:
         case "def":
-            display_help_text("python_funct_cheatsheet.txt")
+            output("python_funct_cheatsheet.txt")
         case "if":
-            display_help_text("python_if_statement.txt")
+            output("python_if_statement.txt")
         case "match":
-            display_help_text("python_match_statement.txt")
+            output("python_match_statement.txt")
         case "python":
-            display_help_text("python_python_general.txt")
+            output("python_python_general.txt")
         case "input":
-            display_help_text("python_input_cheatsheet.txt")
+            output("python_input_cheatsheet.txt")
         case "regex":
-            display_help_text("python_regex_cheatsheet.txt")
+            output("python_regex_cheatsheet.txt")
         case "sqlite":
-            display_help_text("python_sqlite_cheatsheet.txt")
+            output("python_sqlite_cheatsheet.txt")
         case "variables":
-            display_help_text("python_variables_cheatsheet.txt")
+            output("python_variables_cheatsheet.txt")
         case _:
-            print("For help, type 'help', else quit, or type q followed by enter to exit.")
+            print(gray_output("For help, type 'help', else quit, or type q followed by enter to exit."))
 
 
-def display_help_text(aFile):
+def output(someFile):
     cnt :int = 0
-    with open(aFile, "r") as file:
+    with open(someFile, "r") as file:
         lines = file.readlines()
     for line in lines:
-        print(line)
+        #regex func goes here
+        mod_output = parse_titles(line)
+        print(green_output(mod_output))
         cnt += 1
-        if cnt == 15:
-            getInput = input("Press enter to continue or type 'q' to quit:")
+        if cnt == 17:
+            getInput = input(gray_output("Press enter to continue or type 'q' to quit:"))
             if getInput == 'q' or getInput == 'quit' or getInput == 'exit':
                 break
             else:
                 cnt = 0
             print(line)
+
+# NOT working
+def parse_titles(someLine):
+    title_regex = r"\*\*.*\*\*"
+    title_match = re.search(title_regex, someLine)
+    if title_match:
+        return bold_output(gray_output(someLine))
+    else:
+        return someLine
+
+def green_output(someData) -> str:
+    GREEN = "\x1b[32m"
+    processedData = GREEN + someData + GREEN
+    return processedData
+
+def white_output(someData) -> str:
+    WHITE = "\x1b[37m"
+    processedData = WHITE + someData + WHITE
+    return processedData
+
+def gray_output(someData) -> str:
+    GRAY = "\x1b[37m"
+    processedData = GRAY + someData + GRAY
+    return processedData
+
+def bold_output(someData) -> str:
+    BOLD = "\x1b[1m"
+    processedData = BOLD + someData + BOLD
+    return processedData
+
+def reset_output(someData) -> str:
+    RESET = "\x1b[0m"
+    processedData = RESET + someData + RESET
+    return processedData
+
 
 def display_welcome_message():
     os.system("clear")
