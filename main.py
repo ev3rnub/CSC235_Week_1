@@ -28,6 +28,11 @@ def help(name):
             print(blue_output("Sample CLI APP for CSC325: Prof Hinton: Assignment .5.1: Your First Python Application: Verbose Python Help System: Chad Verbus"))
         case "help":
             display_welcome_message()
+        case "takeNote":
+            take_note()
+            print(white_output(f"note written successfully."))
+        case "readNote":
+            read_note()
         case "q":
             isrunning = False
         case "quit":
@@ -35,10 +40,35 @@ def help(name):
         case "exit":
             isrunning = False
         case _:
-            read_help_text(name)
+            read_python_text(name)
+
+# record a note
+def take_note():
+    date = input(blue_output("Enter a unique note name:"))
+    note = input(blue_output("Type your note here:"))
+    with open(f"note/{date}_note.txt", "a") as file:
+        file.write(note)
+        file.write("\n")
+
+# read a note
+def read_note():
+    # list files in note directory
+    files = os.listdir("note")
+    for file in files:
+        print(white_output(file))
+    print("\n\n")
+    # ask user to enter a file name to read.
+    aFile = input(gray_output("Enter a file name to read:"))
+    # output the file to the terminal using our output
+    if aFile != "":
+        output(f"note/{aFile}")
+    elif aFile == "q" or aFile == "quit" or aFile == "exit":
+        return
+    else:
+        print(f"note/{aFile} file")
 
 # match aType and print help text accordingly.
-def read_help_text(aType):
+def read_python_text(aType):
     match aType:
         case "def":
             output("python_funct_cheatsheet.txt")
@@ -125,18 +155,30 @@ def display_welcome_message():
     print(white_output("You can type key words followed by the enter key, the system will display simple text related to the keyword"))
     print("\n\n")
     print(bold_output(white_output("Working Key Words:\n")))
-    print("- help - displays help information")
-    print("- python - what is python?")
-    print("- def - functions and classes in python")
-    print("- if - if statement in python")
-    print("- match - match statement in python")
-    print("- input - input methods in python, accept user input")
-    print("- regex - regular expressions, parses patterns and searches strings")
-    print("- sqlite - general interaction with a local sqlite database")
-    print("- variables - variables in python")
+    print(gray_output("- help - displays help information"))
+    print(gray_output("- python - what is python?"))
+    print(gray_output("- def - functions and classes in python"))
+    print(gray_output("- if - if statement in python"))
+    print(gray_output("- match - match statement in python"))
+    print(gray_output("- input - input methods in python, accept user input"))
+    print(gray_output("- regex - regular expressions, parses patterns and searches strings"))
+    print(gray_output("- sqlite - general interaction with a local sqlite database"))
+    print(gray_output("- variables - variables in python"))
     print("\n\n\n")
+    print(bold_output(white_output("Read and Record Notes:\n")))
+    print(gray_output("- readNote - read a note"))
+    print(gray_output("- takeNote - take a note"))
+    print("\n\n\n")
+
+
+# ensure note folder exists
+def folderCheck():
+    if not os.path.exists("note"):
+        os.mkdir("note")
+        print(green_output("Created note folder."))
 
 # if our python script is run directly, then run main()
 if __name__ == '__main__':
     display_welcome_message()
+    folderCheck()
     main()

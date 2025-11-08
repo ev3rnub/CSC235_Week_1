@@ -15,4 +15,5 @@ Date: Nov 08,2025
 * 2. Updated comments throughout main.
 * 3. Updated white_output func, to use a brighter white color.
 * 4. Updated .txt files with additional source information.
-* 5. Updated Readme.md.
+* 5. Added read and write note functions and added menu options accordingly.
+* 6. Updated Readme.md.
